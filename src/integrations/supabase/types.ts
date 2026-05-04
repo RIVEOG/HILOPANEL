@@ -14,16 +14,382 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      free_plans: {
+        Row: {
+          active: boolean
+          cpu_pct: number
+          created_at: string
+          description: string | null
+          disk_mb: number
+          egg_id: number | null
+          id: string
+          name: string
+          ram_mb: number
+          time_period_seconds: number
+          type: Database["public"]["Enums"]["plan_type"]
+        }
+        Insert: {
+          active?: boolean
+          cpu_pct: number
+          created_at?: string
+          description?: string | null
+          disk_mb: number
+          egg_id?: number | null
+          id?: string
+          name: string
+          ram_mb: number
+          time_period_seconds: number
+          type: Database["public"]["Enums"]["plan_type"]
+        }
+        Update: {
+          active?: boolean
+          cpu_pct?: number
+          created_at?: string
+          description?: string | null
+          disk_mb?: number
+          egg_id?: number | null
+          id?: string
+          name?: string
+          ram_mb?: number
+          time_period_seconds?: number
+          type?: Database["public"]["Enums"]["plan_type"]
+        }
+        Relationships: []
+      }
+      links: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          label: string
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label: string
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label?: string
+          sort_order?: number
+          url?: string
+        }
+        Relationships: []
+      }
+      paid_plans: {
+        Row: {
+          active: boolean
+          cpu_pct: number
+          created_at: string
+          description: string | null
+          discord_redirect: string | null
+          disk_mb: number
+          egg_id: number | null
+          id: string
+          name: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          price_cents: number
+          ram_mb: number
+          type: Database["public"]["Enums"]["plan_type"]
+        }
+        Insert: {
+          active?: boolean
+          cpu_pct: number
+          created_at?: string
+          description?: string | null
+          discord_redirect?: string | null
+          disk_mb: number
+          egg_id?: number | null
+          id?: string
+          name: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          price_cents: number
+          ram_mb: number
+          type: Database["public"]["Enums"]["plan_type"]
+        }
+        Update: {
+          active?: boolean
+          cpu_pct?: number
+          created_at?: string
+          description?: string | null
+          discord_redirect?: string | null
+          disk_mb?: number
+          egg_id?: number | null
+          id?: string
+          name?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          price_cents?: number
+          ram_mb?: number
+          type?: Database["public"]["Enums"]["plan_type"]
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          pterodactyl_user_id: number | null
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          pterodactyl_user_id?: number | null
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          pterodactyl_user_id?: number | null
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      purchases: {
+        Row: {
+          amount_cents: number | null
+          created_at: string
+          id: string
+          paid_plan_id: string | null
+          status: string
+          stripe_session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_cents?: number | null
+          created_at?: string
+          id?: string
+          paid_plan_id?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number | null
+          created_at?: string
+          id?: string
+          paid_plan_id?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_paid_plan_id_fkey"
+            columns: ["paid_plan_id"]
+            isOneToOne: false
+            referencedRelation: "paid_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      servers: {
+        Row: {
+          cpu_pct: number
+          created_at: string
+          disk_mb: number
+          egg_id: number | null
+          expires_at: string | null
+          id: string
+          is_free: boolean
+          name: string
+          pterodactyl_server_id: number | null
+          ram_mb: number
+          suspended: boolean
+          type: Database["public"]["Enums"]["plan_type"]
+          user_id: string
+        }
+        Insert: {
+          cpu_pct: number
+          created_at?: string
+          disk_mb: number
+          egg_id?: number | null
+          expires_at?: string | null
+          id?: string
+          is_free?: boolean
+          name: string
+          pterodactyl_server_id?: number | null
+          ram_mb: number
+          suspended?: boolean
+          type: Database["public"]["Enums"]["plan_type"]
+          user_id: string
+        }
+        Update: {
+          cpu_pct?: number
+          created_at?: string
+          disk_mb?: number
+          egg_id?: number | null
+          expires_at?: string | null
+          id?: string
+          is_free?: boolean
+          name?: string
+          pterodactyl_server_id?: number | null
+          ram_mb?: number
+          suspended?: boolean
+          type?: Database["public"]["Enums"]["plan_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          coins_per_minute: number
+          cost_cpu_per_core: number
+          cost_disk_per_gb: number
+          cost_ram_per_gb: number
+          cost_server_slot: number
+          default_cpu_pct: number
+          default_disk_mb: number
+          default_ram_mb: number
+          default_servers: number
+          id: number
+          panel_name: string
+          panel_tagline: string | null
+          pterodactyl_api_key: string | null
+          pterodactyl_url: string | null
+          smtp_from: string | null
+          smtp_host: string | null
+          smtp_password: string | null
+          smtp_port: number | null
+          smtp_user: string | null
+          stripe_secret_key: string | null
+          stripe_webhook_secret: string | null
+          updated_at: string
+        }
+        Insert: {
+          coins_per_minute?: number
+          cost_cpu_per_core?: number
+          cost_disk_per_gb?: number
+          cost_ram_per_gb?: number
+          cost_server_slot?: number
+          default_cpu_pct?: number
+          default_disk_mb?: number
+          default_ram_mb?: number
+          default_servers?: number
+          id?: number
+          panel_name?: string
+          panel_tagline?: string | null
+          pterodactyl_api_key?: string | null
+          pterodactyl_url?: string | null
+          smtp_from?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          smtp_user?: string | null
+          stripe_secret_key?: string | null
+          stripe_webhook_secret?: string | null
+          updated_at?: string
+        }
+        Update: {
+          coins_per_minute?: number
+          cost_cpu_per_core?: number
+          cost_disk_per_gb?: number
+          cost_ram_per_gb?: number
+          cost_server_slot?: number
+          default_cpu_pct?: number
+          default_disk_mb?: number
+          default_ram_mb?: number
+          default_servers?: number
+          id?: number
+          panel_name?: string
+          panel_tagline?: string | null
+          pterodactyl_api_key?: string | null
+          pterodactyl_url?: string | null
+          smtp_from?: string | null
+          smtp_host?: string | null
+          smtp_password?: string | null
+          smtp_port?: number | null
+          smtp_user?: string | null
+          stripe_secret_key?: string | null
+          stripe_webhook_secret?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_resources: {
+        Row: {
+          coins: number
+          cpu_pct: number
+          disk_mb: number
+          last_afk_at: string | null
+          ram_mb: number
+          server_slots: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coins?: number
+          cpu_pct?: number
+          disk_mb?: number
+          last_afk_at?: string | null
+          ram_mb?: number
+          server_slots?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coins?: number
+          cpu_pct?: number
+          disk_mb?: number
+          last_afk_at?: string | null
+          ram_mb?: number
+          server_slots?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      payment_method: "stripe" | "discord"
+      plan_type: "MINECRAFT" | "PYTHON" | "NODEJS" | "VPS" | "OTHER"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +516,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      payment_method: ["stripe", "discord"],
+      plan_type: ["MINECRAFT", "PYTHON", "NODEJS", "VPS", "OTHER"],
+    },
   },
 } as const
