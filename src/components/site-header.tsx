@@ -1,19 +1,19 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Server, LogOut } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { getPublicConfig } from "@/server/config.functions";
 
 export function SiteHeader() {
   const { user, isAdmin, signOut } = useAuth();
   const [name, setName] = useState("Hilos");
+  const loadCfg = useServerFn(getPublicConfig);
 
   useEffect(() => {
-    supabase.from("settings").select("panel_name").eq("id", 1).maybeSingle().then(({ data }) => {
-      if (data?.panel_name) setName(data.panel_name);
-    });
-  }, []);
+    loadCfg().then((c) => { if (c?.panel_name) setName(c.panel_name); }).catch(() => {});
+  }, [loadCfg]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
