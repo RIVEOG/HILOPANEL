@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { Coins } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { getPublicConfig } from "@/server/config.functions";
 
 export const Route = createFileRoute("/free/afk")({ component: Page });
 
@@ -13,12 +15,13 @@ function Page() {
   const [perMin, setPerMin] = useState(1);
   const [seconds, setSeconds] = useState(0);
   const ref = useRef<number | null>(null);
+  const loadCfg = useServerFn(getPublicConfig);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("settings").select("coins_per_minute").eq("id", 1).maybeSingle().then(({ data }) => setPerMin(data?.coins_per_minute ?? 1));
+    loadCfg().then((c) => setPerMin(c?.coins_per_minute ?? 1)).catch(() => {});
     supabase.from("user_resources").select("coins").eq("user_id", user.id).maybeSingle().then(({ data }) => setCoins(data?.coins ?? 0));
-  }, [user]);
+  }, [user, loadCfg]);
 
   useEffect(() => {
     ref.current = window.setInterval(() => setSeconds((s) => s + 1), 1000);

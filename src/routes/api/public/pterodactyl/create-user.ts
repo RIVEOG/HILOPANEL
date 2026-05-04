@@ -1,20 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { getEnvConfig } from "@/server/env-config.server";
 
 export const Route = createFileRoute("/api/public/pterodactyl/create-user")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = await request.json() as { user_id: string; email: string; username: string; password: string };
-        const { data: s } = await supabaseAdmin.from("settings").select("pterodactyl_url, pterodactyl_api_key").eq("id", 1).maybeSingle();
-        if (!s?.pterodactyl_url || !s?.pterodactyl_api_key) {
-          return Response.json({ error: "Pterodactyl not configured" }, { status: 400 });
+        const body = (await request.json()) as { user_id: string; email: string; username: string; password: string };
+        const env = getEnvConfig();
+        const url = env.pterodactyl?.pterodactyl_url;
+        const key = env.pterodactyl?.pterodactyl_api_key;
+        if (!url || !key) {
+          return Response.json({ error: "Pterodactyl not configured in ENV.json" }, { status: 400 });
         }
         try {
-          const r = await fetch(`${s.pterodactyl_url.replace(/\/$/, "")}/api/application/users`, {
+          const r = await fetch(`${url.replace(/\/$/, "")}/api/application/users`, {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${s.pterodactyl_api_key}`,
+              Authorization: `Bearer ${key}`,
               "Content-Type": "application/json",
               Accept: "application/json",
             },

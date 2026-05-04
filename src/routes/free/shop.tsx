@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { getPublicConfig } from "@/server/config.functions";
 
 export const Route = createFileRoute("/free/shop")({ component: Shop });
 
@@ -11,10 +13,11 @@ function Shop() {
   const { user } = useAuth();
   const [s, setS] = useState<{ cost_ram_per_gb: number; cost_cpu_per_core: number; cost_disk_per_gb: number; cost_server_slot: number } | null>(null);
   const [r, setR] = useState<{ coins: number; ram_mb: number; cpu_pct: number; disk_mb: number; server_slots: number } | null>(null);
+  const loadCfg = useServerFn(getPublicConfig);
 
   const load = async () => {
-    const { data: settings } = await supabase.from("settings").select("cost_ram_per_gb, cost_cpu_per_core, cost_disk_per_gb, cost_server_slot").eq("id", 1).maybeSingle();
-    setS(settings);
+    const cfg = await loadCfg();
+    setS(cfg.shop_costs);
     if (user) {
       const { data } = await supabase.from("user_resources").select("coins, ram_mb, cpu_pct, disk_mb, server_slots").eq("user_id", user.id).maybeSingle();
       setR(data);
