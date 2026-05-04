@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FreeIndexRouteImport } from './routes/free/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as FreeAfkRouteImport } from './routes/free/afk'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPaidplansRouteImport } from './routes/admin/paidplans'
@@ -57,6 +58,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const FreeAfkRoute = FreeAfkRouteImport.update({
+  id: '/afk',
+  path: '/afk',
+  getParentRoute: () => FreeRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/admin/paidplans': typeof AdminPaidplansRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/free/afk': typeof FreeAfkRoute
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
 }
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/admin/paidplans': typeof AdminPaidplansRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/free/afk': typeof FreeAfkRoute
   '/admin': typeof AdminIndexRoute
   '/free': typeof FreeIndexRoute
 }
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/admin/paidplans': typeof AdminPaidplansRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/free/afk': typeof FreeAfkRoute
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
 }
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/admin/paidplans'
     | '/admin/settings'
     | '/admin/users'
+    | '/free/afk'
     | '/admin/'
     | '/free/'
   fileRoutesByTo: FileRoutesByTo
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/admin/paidplans'
     | '/admin/settings'
     | '/admin/users'
+    | '/free/afk'
     | '/admin'
     | '/free'
   id:
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/admin/paidplans'
     | '/admin/settings'
     | '/admin/users'
+    | '/free/afk'
     | '/admin/'
     | '/free/'
   fileRoutesById: FileRoutesById
@@ -226,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/free/afk': {
+      id: '/free/afk'
+      path: '/afk'
+      fullPath: '/free/afk'
+      preLoaderRoute: typeof FreeAfkRouteImport
+      parentRoute: typeof FreeRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -285,10 +304,12 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface FreeRouteChildren {
+  FreeAfkRoute: typeof FreeAfkRoute
   FreeIndexRoute: typeof FreeIndexRoute
 }
 
 const FreeRouteChildren: FreeRouteChildren = {
+  FreeAfkRoute: FreeAfkRoute,
   FreeIndexRoute: FreeIndexRoute,
 }
 
