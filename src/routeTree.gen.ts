@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PaidIndexRouteImport } from './routes/paid/index'
 import { Route as FreeIndexRouteImport } from './routes/free/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as PaidTypeRouteImport } from './routes/paid/$type'
 import { Route as FreeShopRouteImport } from './routes/free/shop'
 import { Route as FreeCreationRouteImport } from './routes/free/creation'
 import { Route as FreeAfkRouteImport } from './routes/free/afk'
@@ -71,6 +72,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const PaidTypeRoute = PaidTypeRouteImport.update({
+  id: '/$type',
+  path: '/$type',
+  getParentRoute: () => PaidRoute,
 } as any)
 const FreeShopRoute = FreeShopRouteImport.update({
   id: '/shop',
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/free/afk': typeof FreeAfkRoute
   '/free/creation': typeof FreeCreationRoute
   '/free/shop': typeof FreeShopRoute
+  '/paid/$type': typeof PaidTypeRoute
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
   '/paid/': typeof PaidIndexRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/free/afk': typeof FreeAfkRoute
   '/free/creation': typeof FreeCreationRoute
   '/free/shop': typeof FreeShopRoute
+  '/paid/$type': typeof PaidTypeRoute
   '/admin': typeof AdminIndexRoute
   '/free': typeof FreeIndexRoute
   '/paid': typeof PaidIndexRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/free/afk': typeof FreeAfkRoute
   '/free/creation': typeof FreeCreationRoute
   '/free/shop': typeof FreeShopRoute
+  '/paid/$type': typeof PaidTypeRoute
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
   '/paid/': typeof PaidIndexRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/free/afk'
     | '/free/creation'
     | '/free/shop'
+    | '/paid/$type'
     | '/admin/'
     | '/free/'
     | '/paid/'
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/free/afk'
     | '/free/creation'
     | '/free/shop'
+    | '/paid/$type'
     | '/admin'
     | '/free'
     | '/paid'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/free/afk'
     | '/free/creation'
     | '/free/shop'
+    | '/paid/$type'
     | '/admin/'
     | '/free/'
     | '/paid/'
@@ -298,6 +310,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/paid/$type': {
+      id: '/paid/$type'
+      path: '/$type'
+      fullPath: '/paid/$type'
+      preLoaderRoute: typeof PaidTypeRouteImport
+      parentRoute: typeof PaidRoute
     }
     '/free/shop': {
       id: '/free/shop'
@@ -395,10 +414,12 @@ const FreeRouteChildren: FreeRouteChildren = {
 const FreeRouteWithChildren = FreeRoute._addFileChildren(FreeRouteChildren)
 
 interface PaidRouteChildren {
+  PaidTypeRoute: typeof PaidTypeRoute
   PaidIndexRoute: typeof PaidIndexRoute
 }
 
 const PaidRouteChildren: PaidRouteChildren = {
+  PaidTypeRoute: PaidTypeRoute,
   PaidIndexRoute: PaidIndexRoute,
 }
 
