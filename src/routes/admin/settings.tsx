@@ -1,76 +1,33 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { getPublicConfig, type PublicConfig } from "@/server/config.functions";
 import { useServerFn } from "@tanstack/react-start";
-import { importEnvJson } from "@/server/env-import.functions";
 
 export const Route = createFileRoute("/admin/settings")({ component: SettingsPage });
 
-type Settings = {
-  panel_name: string; panel_tagline: string | null;
-  pterodactyl_url: string | null; pterodactyl_api_key: string | null;
-  stripe_secret_key: string | null; stripe_webhook_secret: string | null;
-  smtp_host: string | null; smtp_port: number | null; smtp_user: string | null; smtp_password: string | null; smtp_from: string | null;
-  default_ram_mb: number; default_cpu_pct: number; default_disk_mb: number; default_servers: number;
-  coins_per_minute: number;
-  cost_ram_per_gb: number; cost_cpu_per_core: number; cost_disk_per_gb: number; cost_server_slot: number;
-  env_imported_at: string | null;
-};
-
 function SettingsPage() {
-  const [s, setS] = useState<Settings | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [importing, setImporting] = useState(false);
-  const importFn = useServerFn(importEnvJson);
+  const [cfg, setCfg] = useState<PublicConfig | null>(null);
+  const load = useServerFn(getPublicConfig);
 
-  useEffect(() => {
-    supabase.from("settings").select("*").eq("id", 1).maybeSingle().then(({ data }) => setS(data as Settings));
-  }, []);
+  useEffect(() => { load().then(setCfg); }, [load]);
 
-  if (!s) return <div className="text-muted-foreground">Loading…</div>;
+  if (!cfg) return <div className="text-muted-foreground">Loading…</div>;
 
-  const runImport = async () => {
-    setImporting(true);
-    try {
-      const res = await importFn();
-      if (res.skipped) {
-        toast.message("ENV.json already imported");
-      } else {
-        toast.success(`Imported ${res.fieldsImported} field(s) from ENV.json`);
-      }
-      const { data } = await supabase.from("settings").select("*").eq("id", 1).maybeSingle();
-      setS(data as Settings);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Import failed");
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  const set = <K extends keyof Settings>(k: K, v: Settings[K]) => setS({ ...s, [k]: v });
-
-  const save = async () => {
-    setSaving(true);
-    const { error } = await supabase.from("settings").update(s).eq("id", 1);
-    setSaving(false);
-    if (error) toast.error(error.message);
-    else toast.success("Settings saved");
-  };
-
-  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <div className="rounded-lg border border-border bg-card p-6">
-      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
-      <div className="grid gap-4 md:grid-cols-2">{children}</div>
+  const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
+    <div className="flex items-center justify-between border-b border-border py-3 last:border-0">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="text-sm font-medium">{value}</span>
     </div>
   );
-  const F = ({ label, k, type = "text" }: { label: string; k: keyof Settings; type?: string }) => (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <Input type={type} value={(s[k] as string | number | null) ?? ""} onChange={(e) => set(k, (type === "number" ? Number(e.target.value) : e.target.value) as Settings[typeof k])} />
+  const Status = ({ ok }: { ok: boolean }) => (
+    <span className={ok ? "text-emerald-500" : "text-amber-500"}>
+      {ok ? "Configured" : "Not configured"}
+    </span>
+  );
+  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div className="rounded-lg border border-border bg-card p-6">
+      <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
+      <div>{children}</div>
     </div>
   );
 
@@ -78,59 +35,48 @@ function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Panel name, integrations, defaults — all live in the database. No ENV.json to leak.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          All configuration lives in <code className="rounded bg-muted px-1 py-0.5">ENV.json</code> at the project root.
+          Edit that file to change any value — the server reads it on every request.
+        </p>
       </div>
-      {!s.env_imported_at && (
-        <div className="rounded-lg border border-primary/30 bg-primary/5 p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h3 className="text-sm font-semibold">Import from ENV.json</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                We found an <code>ENV.json</code> template in the project. Import its values into the
-                settings table now? This is a one-time action — this card disappears after import.
-              </p>
-            </div>
-            <Button onClick={runImport} disabled={importing}>
-              {importing ? "Importing…" : "Import now"}
-            </Button>
-          </div>
-        </div>
-      )}
+
+      <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+        <p className="font-medium">How placeholders work</p>
+        <p className="mt-1 text-muted-foreground">
+          Anywhere a value is needed (e.g. an outgoing API call), the server resolves tokens
+          like <code className="rounded bg-muted px-1">{"{PTERODACTYL_API_KEY}"}</code>,{" "}
+          <code className="rounded bg-muted px-1">{"{PANEL_NAME}"}</code>, or{" "}
+          <code className="rounded bg-muted px-1">{"{STRIPE_SECRET_KEY}"}</code> from ENV.json. Secrets are never sent to the browser.
+        </p>
+      </div>
+
       <Section title="Branding">
-        <F label="Panel name" k="panel_name" />
-        <F label="Tagline" k="panel_tagline" />
+        <Row label="Panel name" value={cfg.panel_name} />
+        <Row label="Tagline" value={cfg.panel_tagline || "—"} />
       </Section>
-      <Section title="Pterodactyl">
-        <F label="Panel URL (https://panel.example.com)" k="pterodactyl_url" />
-        <F label="Application API key" k="pterodactyl_api_key" />
+
+      <Section title="Integrations">
+        <Row label="Pterodactyl URL" value={cfg.pterodactyl_url || "—"} />
+        <Row label="Pterodactyl API key" value={<Status ok={cfg.pterodactyl_configured} />} />
+        <Row label="Stripe" value={<Status ok={cfg.stripe_configured} />} />
+        <Row label="SMTP" value={<Status ok={cfg.smtp_configured} />} />
       </Section>
-      <Section title="Stripe">
-        <F label="Secret key (sk_live_… / sk_test_…)" k="stripe_secret_key" />
-        <F label="Webhook secret (whsec_…)" k="stripe_webhook_secret" />
-      </Section>
-      <Section title="SMTP (password reset / mail)">
-        <F label="Host" k="smtp_host" />
-        <F label="Port" k="smtp_port" type="number" />
-        <F label="Username" k="smtp_user" />
-        <F label="Password" k="smtp_password" />
-        <F label="From address" k="smtp_from" />
-      </Section>
+
       <Section title="Default user resources">
-        <F label="RAM (MB)" k="default_ram_mb" type="number" />
-        <F label="CPU (%)" k="default_cpu_pct" type="number" />
-        <F label="Disk (MB)" k="default_disk_mb" type="number" />
-        <F label="Server slots" k="default_servers" type="number" />
+        <Row label="RAM" value={`${cfg.defaults.ram_mb} MB`} />
+        <Row label="CPU" value={`${cfg.defaults.cpu_pct}%`} />
+        <Row label="Disk" value={`${cfg.defaults.disk_mb} MB`} />
+        <Row label="Server slots" value={cfg.defaults.servers} />
       </Section>
+
       <Section title="AFK shop economy">
-        <F label="Coins per minute (AFK)" k="coins_per_minute" type="number" />
-        <F label="Cost: RAM per GB" k="cost_ram_per_gb" type="number" />
-        <F label="Cost: CPU per 100%" k="cost_cpu_per_core" type="number" />
-        <F label="Cost: Disk per GB" k="cost_disk_per_gb" type="number" />
-        <F label="Cost: extra server slot" k="cost_server_slot" type="number" />
+        <Row label="Coins per minute (AFK)" value={cfg.coins_per_minute} />
+        <Row label="Cost: +1 GB RAM" value={`${cfg.shop_costs.cost_ram_per_gb} coins`} />
+        <Row label="Cost: +100% CPU" value={`${cfg.shop_costs.cost_cpu_per_core} coins`} />
+        <Row label="Cost: +1 GB Disk" value={`${cfg.shop_costs.cost_disk_per_gb} coins`} />
+        <Row label="Cost: +1 server slot" value={`${cfg.shop_costs.cost_server_slot} coins`} />
       </Section>
-      <div className="flex justify-end">
-        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save changes"}</Button>
-      </div>
     </div>
   );
 }
