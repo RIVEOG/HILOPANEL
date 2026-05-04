@@ -255,6 +255,7 @@ export type Database = {
           default_disk_mb: number
           default_ram_mb: number
           default_servers: number
+          env_imported_at: string | null
           id: number
           panel_name: string
           panel_tagline: string | null
@@ -279,6 +280,7 @@ export type Database = {
           default_disk_mb?: number
           default_ram_mb?: number
           default_servers?: number
+          env_imported_at?: string | null
           id?: number
           panel_name?: string
           panel_tagline?: string | null
@@ -303,6 +305,7 @@ export type Database = {
           default_disk_mb?: number
           default_ram_mb?: number
           default_servers?: number
+          env_imported_at?: string | null
           id?: number
           panel_name?: string
           panel_tagline?: string | null
