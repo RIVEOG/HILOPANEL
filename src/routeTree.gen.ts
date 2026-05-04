@@ -15,6 +15,8 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminPaidplansRouteImport } from './routes/admin/paidplans'
+import { Route as AdminLinksRouteImport } from './routes/admin/links'
 import { Route as AdminFreeplansRouteImport } from './routes/admin/freeplans'
 
 const SignupRoute = SignupRouteImport.update({
@@ -47,6 +49,16 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPaidplansRoute = AdminPaidplansRouteImport.update({
+  id: '/paidplans',
+  path: '/paidplans',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLinksRoute = AdminLinksRouteImport.update({
+  id: '/links',
+  path: '/links',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFreeplansRoute = AdminFreeplansRouteImport.update({
   id: '/freeplans',
   path: '/freeplans',
@@ -59,6 +71,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/admin/freeplans': typeof AdminFreeplansRoute
+  '/admin/links': typeof AdminLinksRoute
+  '/admin/paidplans': typeof AdminPaidplansRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -67,6 +81,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/admin/freeplans': typeof AdminFreeplansRoute
+  '/admin/links': typeof AdminLinksRoute
+  '/admin/paidplans': typeof AdminPaidplansRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -77,6 +93,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/admin/freeplans': typeof AdminFreeplansRoute
+  '/admin/links': typeof AdminLinksRoute
+  '/admin/paidplans': typeof AdminPaidplansRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -88,6 +106,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/admin/freeplans'
+    | '/admin/links'
+    | '/admin/paidplans'
     | '/admin/settings'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -96,6 +116,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/admin/freeplans'
+    | '/admin/links'
+    | '/admin/paidplans'
     | '/admin/settings'
     | '/admin'
   id:
@@ -105,6 +127,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/admin/freeplans'
+    | '/admin/links'
+    | '/admin/paidplans'
     | '/admin/settings'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -160,6 +184,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/paidplans': {
+      id: '/admin/paidplans'
+      path: '/paidplans'
+      fullPath: '/admin/paidplans'
+      preLoaderRoute: typeof AdminPaidplansRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/links': {
+      id: '/admin/links'
+      path: '/links'
+      fullPath: '/admin/links'
+      preLoaderRoute: typeof AdminLinksRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/freeplans': {
       id: '/admin/freeplans'
       path: '/freeplans'
@@ -172,12 +210,16 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminFreeplansRoute: typeof AdminFreeplansRoute
+  AdminLinksRoute: typeof AdminLinksRoute
+  AdminPaidplansRoute: typeof AdminPaidplansRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminFreeplansRoute: AdminFreeplansRoute,
+  AdminLinksRoute: AdminLinksRoute,
+  AdminPaidplansRoute: AdminPaidplansRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -193,3 +235,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
