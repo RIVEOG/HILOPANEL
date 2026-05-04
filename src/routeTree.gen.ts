@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as FreeRouteImport } from './routes/free'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PaidIndexRouteImport } from './routes/paid/index'
 import { Route as FreeIndexRouteImport } from './routes/free/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as FreeShopRouteImport } from './routes/free/shop'
@@ -55,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PaidIndexRoute = PaidIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PaidRoute,
 } as any)
 const FreeIndexRoute = FreeIndexRouteImport.update({
   id: '/',
@@ -112,7 +118,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/free': typeof FreeRouteWithChildren
   '/login': typeof LoginRoute
-  '/paid': typeof PaidRoute
+  '/paid': typeof PaidRouteWithChildren
   '/signup': typeof SignupRoute
   '/admin/freeplans': typeof AdminFreeplansRoute
   '/admin/links': typeof AdminLinksRoute
@@ -124,11 +130,11 @@ export interface FileRoutesByFullPath {
   '/free/shop': typeof FreeShopRoute
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
+  '/paid/': typeof PaidIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/paid': typeof PaidRoute
   '/signup': typeof SignupRoute
   '/admin/freeplans': typeof AdminFreeplansRoute
   '/admin/links': typeof AdminLinksRoute
@@ -140,6 +146,7 @@ export interface FileRoutesByTo {
   '/free/shop': typeof FreeShopRoute
   '/admin': typeof AdminIndexRoute
   '/free': typeof FreeIndexRoute
+  '/paid': typeof PaidIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -147,7 +154,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/free': typeof FreeRouteWithChildren
   '/login': typeof LoginRoute
-  '/paid': typeof PaidRoute
+  '/paid': typeof PaidRouteWithChildren
   '/signup': typeof SignupRoute
   '/admin/freeplans': typeof AdminFreeplansRoute
   '/admin/links': typeof AdminLinksRoute
@@ -159,6 +166,7 @@ export interface FileRoutesById {
   '/free/shop': typeof FreeShopRoute
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
+  '/paid/': typeof PaidIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -179,11 +187,11 @@ export interface FileRouteTypes {
     | '/free/shop'
     | '/admin/'
     | '/free/'
+    | '/paid/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/paid'
     | '/signup'
     | '/admin/freeplans'
     | '/admin/links'
@@ -195,6 +203,7 @@ export interface FileRouteTypes {
     | '/free/shop'
     | '/admin'
     | '/free'
+    | '/paid'
   id:
     | '__root__'
     | '/'
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/free/shop'
     | '/admin/'
     | '/free/'
+    | '/paid/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -220,7 +230,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   FreeRoute: typeof FreeRouteWithChildren
   LoginRoute: typeof LoginRoute
-  PaidRoute: typeof PaidRoute
+  PaidRoute: typeof PaidRouteWithChildren
   SignupRoute: typeof SignupRoute
 }
 
@@ -267,6 +277,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/paid/': {
+      id: '/paid/'
+      path: '/'
+      fullPath: '/paid/'
+      preLoaderRoute: typeof PaidIndexRouteImport
+      parentRoute: typeof PaidRoute
     }
     '/free/': {
       id: '/free/'
@@ -377,12 +394,22 @@ const FreeRouteChildren: FreeRouteChildren = {
 
 const FreeRouteWithChildren = FreeRoute._addFileChildren(FreeRouteChildren)
 
+interface PaidRouteChildren {
+  PaidIndexRoute: typeof PaidIndexRoute
+}
+
+const PaidRouteChildren: PaidRouteChildren = {
+  PaidIndexRoute: PaidIndexRoute,
+}
+
+const PaidRouteWithChildren = PaidRoute._addFileChildren(PaidRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   FreeRoute: FreeRouteWithChildren,
   LoginRoute: LoginRoute,
-  PaidRoute: PaidRoute,
+  PaidRoute: PaidRouteWithChildren,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
