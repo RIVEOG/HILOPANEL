@@ -64,7 +64,7 @@ export const importEnvJson = createServerFn({ method: "POST" })
 
     const { error } = await supabaseAdmin
       .from("settings")
-      .update(update)
+      .update(update as never)
       .eq("id", 1);
     if (error) throw new Error(error.message);
 
