@@ -34,12 +34,16 @@ function Page() {
   const add = async () => {
     const seconds = parsePeriod(form.period);
     if (!seconds) return toast.error("Time period: use e.g. 1mo, 1wk, 1d, 1h, 1min, 1sec");
-    const { error } = await supabase.from("free_plans").insert({
-      name: form.name, type: form.type as Plan["type"],
-      ram_mb: Number(form.ram), cpu_pct: Number(form.cpu), disk_mb: Number(form.disk),
-      time_period_seconds: seconds, egg_id: form.egg ? Number(form.egg) : null,
+    const { error } = await supabase.from("free_plans").insert([{
+      name: form.name,
+      type: form.type as "MINECRAFT" | "PYTHON" | "NODEJS" | "VPS" | "OTHER",
+      ram_mb: Number(form.ram),
+      cpu_pct: Number(form.cpu),
+      disk_mb: Number(form.disk),
+      time_period_seconds: seconds,
+      egg_id: form.egg ? Number(form.egg) : null,
       description: form.description || null,
-    });
+    }]);
     if (error) return toast.error(error.message);
     toast.success("Free plan added");
     setForm({ name: "", type: "MINECRAFT", ram: "1024", cpu: "50", disk: "5120", period: "1d", egg: "", description: "" });
