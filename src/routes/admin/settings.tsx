@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { importEnvJson } from "@/server/env-import.functions";
 
 export const Route = createFileRoute("/admin/settings")({ component: SettingsPage });
 
@@ -16,17 +18,38 @@ type Settings = {
   default_ram_mb: number; default_cpu_pct: number; default_disk_mb: number; default_servers: number;
   coins_per_minute: number;
   cost_ram_per_gb: number; cost_cpu_per_core: number; cost_disk_per_gb: number; cost_server_slot: number;
+  env_imported_at: string | null;
 };
 
 function SettingsPage() {
   const [s, setS] = useState<Settings | null>(null);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const importFn = useServerFn(importEnvJson);
 
   useEffect(() => {
     supabase.from("settings").select("*").eq("id", 1).maybeSingle().then(({ data }) => setS(data as Settings));
   }, []);
 
   if (!s) return <div className="text-muted-foreground">Loading…</div>;
+
+  const runImport = async () => {
+    setImporting(true);
+    try {
+      const res = await importFn();
+      if (res.skipped) {
+        toast.message("ENV.json already imported");
+      } else {
+        toast.success(`Imported ${res.fieldsImported} field(s) from ENV.json`);
+      }
+      const { data } = await supabase.from("settings").select("*").eq("id", 1).maybeSingle();
+      setS(data as Settings);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Import failed");
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => setS({ ...s, [k]: v });
 
@@ -57,6 +80,22 @@ function SettingsPage() {
         <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">Panel name, integrations, defaults — all live in the database. No ENV.json to leak.</p>
       </div>
+      {!s.env_imported_at && (
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-semibold">Import from ENV.json</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                We found an <code>ENV.json</code> template in the project. Import its values into the
+                settings table now? This is a one-time action — this card disappears after import.
+              </p>
+            </div>
+            <Button onClick={runImport} disabled={importing}>
+              {importing ? "Importing…" : "Import now"}
+            </Button>
+          </div>
+        </div>
+      )}
       <Section title="Branding">
         <F label="Panel name" k="panel_name" />
         <F label="Tagline" k="panel_tagline" />
