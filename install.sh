@@ -1,53 +1,74 @@
 #!/bin/bash
 
+# ================= COLORS =================
 CYAN="\033[1;36m"
 GREEN="\033[1;32m"
 RED="\033[1;31m"
 YELLOW="\033[1;33m"
 RESET="\033[0m"
 
+REPO="https://github.com/RIVEOG/HILOPANEL.git"
+DIR=""
+
 clear
 
 echo -e "${CYAN}"
 echo "========================================"
 echo ""
-echo " N E T H O S T       R E P R E S E N T S       H I L O       P A N E L"
-echo "         copyright content do not use without credit"
+echo "   N E T H O S T   →   H I L O P A N E L"
+echo "   Premium Game & App Hosting Panel"
 echo ""
 echo "========================================"
 echo -e "${RESET}"
 
-read -p "Are you at least 13 years old and know setup? (y/n): " age
+read -p "Are you at least 13 years old? (y/n): " age
 
 if [[ "$age" != "y" ]]; then
-    echo -e "${RED}Exit...${RESET}"
+    echo -e "${RED}Exiting...${RESET}"
     exit 1
 fi
 
-REPO="https://github.com/RIVEOG/HILOPANEL.git"
+# ================= DEPENDENCIES =================
+install_dependencies() {
+    echo -e "${YELLOW}Updating system...${RESET}"
 
-DIR=""
+    apt update -y && apt upgrade -y
 
+    echo -e "${YELLOW}Installing base tools...${RESET}"
+    apt install -y git curl wget jq
+
+    echo -e "${YELLOW}Installing Node.js...${RESET}"
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    apt install -y nodejs
+
+    echo -e "${YELLOW}Installing PM2...${RESET}"
+    npm install -g pm2
+
+    echo -e "${GREEN}All dependencies installed!${RESET}"
+    read -p "Press enter..."
+}
+
+# ================= INSTALL =================
 install_files() {
-    echo -e "${GREEN}Cloning repo...${RESET}"
+    echo -e "${GREEN}Cloning repository...${RESET}"
 
     git clone $REPO
 
-    # FIX: auto detect folder (no more cd error)
+    # FIX: auto-detect folder (no cd errors)
     DIR=$(ls -d */ | grep -i hilopanel | head -n 1)
 
     if [ -z "$DIR" ]; then
-        echo -e "${RED}Repo folder not found!${RESET}"
+        echo -e "${RED}Folder not found after clone!${RESET}"
         exit 1
     fi
 
     cd "$DIR" || exit
 
-    echo -e "${GREEN}Running install.sh...${RESET}"
+    echo -e "${YELLOW}Running install script...${RESET}"
     chmod +x install.sh
     bash install.sh
 
-    echo -e "${YELLOW}Starting PM2...${RESET}"
+    echo -e "${YELLOW}Starting with PM2...${RESET}"
 
     PORT=${PORT:-3000}
 
@@ -58,47 +79,48 @@ install_files() {
     read -p "Press enter..."
 }
 
+# ================= SETUP ENV =================
 setup_env() {
     FILE="ENV.json"
 
     if [ ! -f "$FILE" ]; then
-        echo -e "${RED}ENV.json not found${RESET}"
+        echo -e "${RED}ENV.json not found. Run install first.${RESET}"
         return
     fi
 
     read -p "Hosting Name (Hilos): " pname
     read -p "Hosting Tag (Premium game & app hosting): " ptag
 
-    read -p "Install admin? (y/n): " admin
+    read -p "Setup admin account? (y/n): " admin
 
     if [[ "$admin" == "y" ]]; then
-        read -p "Email: " aemail
-        read -p "Username: " auser
-        read -p "Password: " apass
+        read -p "Admin Email: " aemail
+        read -p "Admin Username: " auser
+        read -p "Admin Password: " apass
     fi
 
-    read -p "Pterodactyl setup? (y/n): " ptero
+    read -p "Setup Pterodactyl? (y/n): " ptero
     if [[ "$ptero" == "y" ]]; then
-        read -p "Panel link: " plink
-        read -p "API key: " papi
+        read -p "Panel URL: " plink
+        read -p "API Key: " papi
     fi
 
-    read -p "Stripe setup? (y/n): " stripe
+    read -p "Setup Stripe? (y/n): " stripe
     if [[ "$stripe" == "y" ]]; then
-        read -p "Secret key: " skey
-        read -p "Webhook secret: " sweb
+        read -p "Secret Key: " skey
+        read -p "Webhook Secret: " sweb
     fi
 
-    read -p "SMTP setup? (y/n): " smtp
+    read -p "Setup SMTP? (y/n): " smtp
     if [[ "$smtp" == "y" ]]; then
         read -p "Host: " shost
         read -p "Port: " sport
         read -p "User: " suser
-        read -p "Pass: " spass
+        read -p "Password: " spass
         read -p "From: " sfrom
     fi
 
-    echo -e "${GREEN}Saving config...${RESET}"
+    echo -e "${GREEN}Updating config...${RESET}"
 
     jq "
     .panel.panel_name = \"${pname:-Hilos}\" |
@@ -121,38 +143,44 @@ setup_env() {
     read -p "Press enter..."
 }
 
+# ================= DELETE =================
 delete_files() {
-    echo -e "${RED}Deleting...${RESET}"
+    echo -e "${RED}Deleting project...${RESET}"
     rm -rf HILOPANEL hilopanel
     pm2 delete HILOPANEL 2>/dev/null
 }
 
+# ================= REINSTALL =================
 reinstall_files() {
     delete_files
     install_files
 }
 
+# ================= PM2 STATUS =================
 pm2_status() {
     pm2 status
-    read -p "Enter..."
+    read -p "Press enter..."
 }
 
+# ================= MENU =================
 while true; do
     clear
+
     echo -e "${CYAN}"
-    echo "====================="
-    echo " H I L O   P A N E L "
-    echo "====================="
-    echo "1) Install"
+    echo "========================="
+    echo "   H I L O   P A N E L"
+    echo "========================="
+    echo "1) Install Panel"
     echo "2) Setup ENV"
-    echo "3) Delete"
-    echo "4) Reinstall"
-    echo "5) PM2 status"
+    echo "3) Delete Panel"
+    echo "4) Reinstall Panel"
+    echo "5) PM2 Status"
+    echo "6) Install Dependencies"
     echo "0) Exit"
-    echo "====================="
+    echo "========================="
     echo -e "${RESET}"
 
-    read -p "Select: " opt
+    read -p "Select option: " opt
 
     case $opt in
         1) install_files ;;
@@ -160,7 +188,8 @@ while true; do
         3) delete_files ;;
         4) reinstall_files ;;
         5) pm2_status ;;
+        6) install_dependencies ;;
         0) exit ;;
-        *) echo "Invalid"; sleep 1 ;;
+        *) echo "Invalid option"; sleep 1 ;;
     esac
 done
