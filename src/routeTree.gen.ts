@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PaidRouteImport } from './routes/paid'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FreeRouteImport } from './routes/free'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -28,6 +29,11 @@ import { Route as AdminFreeplansRouteImport } from './routes/admin/freeplans'
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaidRoute = PaidRouteImport.update({
+  id: '/paid',
+  path: '/paid',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/free': typeof FreeRouteWithChildren
   '/login': typeof LoginRoute
+  '/paid': typeof PaidRoute
   '/signup': typeof SignupRoute
   '/admin/freeplans': typeof AdminFreeplansRoute
   '/admin/links': typeof AdminLinksRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/paid': typeof PaidRoute
   '/signup': typeof SignupRoute
   '/admin/freeplans': typeof AdminFreeplansRoute
   '/admin/links': typeof AdminLinksRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/free': typeof FreeRouteWithChildren
   '/login': typeof LoginRoute
+  '/paid': typeof PaidRoute
   '/signup': typeof SignupRoute
   '/admin/freeplans': typeof AdminFreeplansRoute
   '/admin/links': typeof AdminLinksRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/free'
     | '/login'
+    | '/paid'
     | '/signup'
     | '/admin/freeplans'
     | '/admin/links'
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/paid'
     | '/signup'
     | '/admin/freeplans'
     | '/admin/links'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/free'
     | '/login'
+    | '/paid'
     | '/signup'
     | '/admin/freeplans'
     | '/admin/links'
@@ -208,6 +220,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   FreeRoute: typeof FreeRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PaidRoute: typeof PaidRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paid': {
+      id: '/paid'
+      path: '/paid'
+      fullPath: '/paid'
+      preLoaderRoute: typeof PaidRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -362,6 +382,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   FreeRoute: FreeRouteWithChildren,
   LoginRoute: LoginRoute,
+  PaidRoute: PaidRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
