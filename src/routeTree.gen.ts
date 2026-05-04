@@ -27,6 +27,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPaidplansRouteImport } from './routes/admin/paidplans'
 import { Route as AdminLinksRouteImport } from './routes/admin/links'
 import { Route as AdminFreeplansRouteImport } from './routes/admin/freeplans'
+import { Route as ApiPublicPterodactylCreateUserRouteImport } from './routes/api/public/pterodactyl/create-user'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -118,6 +119,12 @@ const AdminFreeplansRoute = AdminFreeplansRouteImport.update({
   path: '/freeplans',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicPterodactylCreateUserRoute =
+  ApiPublicPterodactylCreateUserRouteImport.update({
+    id: '/api/public/pterodactyl/create-user',
+    path: '/api/public/pterodactyl/create-user',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
   '/paid/': typeof PaidIndexRoute
+  '/api/public/pterodactyl/create-user': typeof ApiPublicPterodactylCreateUserRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -155,6 +163,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/free': typeof FreeIndexRoute
   '/paid': typeof PaidIndexRoute
+  '/api/public/pterodactyl/create-user': typeof ApiPublicPterodactylCreateUserRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -176,6 +185,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
   '/paid/': typeof PaidIndexRoute
+  '/api/public/pterodactyl/create-user': typeof ApiPublicPterodactylCreateUserRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/free/'
     | '/paid/'
+    | '/api/public/pterodactyl/create-user'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/free'
     | '/paid'
+    | '/api/public/pterodactyl/create-user'
   id:
     | '__root__'
     | '/'
@@ -235,6 +247,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/free/'
     | '/paid/'
+    | '/api/public/pterodactyl/create-user'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -244,6 +257,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PaidRoute: typeof PaidRouteWithChildren
   SignupRoute: typeof SignupRoute
+  ApiPublicPterodactylCreateUserRoute: typeof ApiPublicPterodactylCreateUserRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -374,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFreeplansRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/pterodactyl/create-user': {
+      id: '/api/public/pterodactyl/create-user'
+      path: '/api/public/pterodactyl/create-user'
+      fullPath: '/api/public/pterodactyl/create-user'
+      preLoaderRoute: typeof ApiPublicPterodactylCreateUserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -432,6 +453,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PaidRoute: PaidRouteWithChildren,
   SignupRoute: SignupRoute,
+  ApiPublicPterodactylCreateUserRoute: ApiPublicPterodactylCreateUserRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
