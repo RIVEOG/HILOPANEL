@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import envJson from "../../ENV.json";
+import envJsonRaw from "../../ENV.json?raw";
 
 /**
  * Reads ENV.json (bundled at build time) and writes its non-empty values
@@ -32,7 +32,12 @@ export const importEnvJson = createServerFn({ method: "POST" })
       return { skipped: true as const, reason: "already-imported" };
     }
 
-    const env = envJson as Record<string, any>;
+    let env: Record<string, any> = {};
+    try {
+      env = JSON.parse(envJsonRaw);
+    } catch {
+      throw new Error("ENV.json is not valid JSON");
+    }
     const flat: Record<string, unknown> = {
       ...(env.panel ?? {}),
       ...(env.pterodactyl ?? {}),
