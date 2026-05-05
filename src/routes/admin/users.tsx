@@ -7,6 +7,8 @@ import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/admin/users")({ component: Page });
 
+const PROTECTED_ADMIN_EMAIL = "admin@nethost.space";
+
 type Profile = { id: string; username: string; email: string };
 type Role = { user_id: string; role: "admin" | "user" };
 
@@ -18,7 +20,10 @@ function Page() {
   const load = async () => {
     const { data: profs } = await supabase.from("profiles").select("id, username, email").order("created_at", { ascending: false });
     const { data: rs } = await supabase.from("user_roles").select("user_id, role");
-    setUsers((profs ?? []) as Profile[]);
+    // Hide the hardcoded protected admin from the list.
+    setUsers(((profs ?? []) as Profile[]).filter(
+      (p) => p.email?.toLowerCase() !== PROTECTED_ADMIN_EMAIL,
+    ));
     const map: Record<string, boolean> = {};
     (rs as Role[] | null ?? []).forEach((r) => { if (r.role === "admin") map[r.user_id] = true; });
     setRoles(map);
