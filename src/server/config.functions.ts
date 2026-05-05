@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getEnvConfig } from "./env-config.server";
+import envJsonRaw from "../../ENV.json?raw";
+import { validateEnv, type EnvValidation } from "./env-schema";
 
 /**
  * Returns ONLY the public, client-safe slice of ENV.json.
@@ -31,3 +33,13 @@ export const getPublicConfig = createServerFn({ method: "GET" }).handler(async (
 });
 
 export type PublicConfig = Awaited<ReturnType<typeof getPublicConfig>>;
+
+/**
+ * Returns the validation status of ENV.json. Used by /admin/settings to
+ * display clear errors when required fields are missing or invalid.
+ */
+export const getEnvValidation = createServerFn({ method: "GET" }).handler(
+  async (): Promise<EnvValidation> => {
+    return validateEnv(envJsonRaw);
+  },
+);
