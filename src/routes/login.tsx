@@ -1,8 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useServerFn } from "@tanstack/react-start";
-import { ensureProtectedAdmin } from "@/server/ensure-admin.functions";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,9 +14,9 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const ensureAdmin = useServerFn(ensureProtectedAdmin);
-
-  useEffect(() => { ensureAdmin().catch(() => {}); }, [ensureAdmin]);
+  useEffect(() => {
+    fetch("/api/public/ensure-admin", { method: "POST" }).catch(() => {});
+  }, []);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
