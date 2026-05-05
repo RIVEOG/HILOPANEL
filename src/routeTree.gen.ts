@@ -27,6 +27,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminPaidplansRouteImport } from './routes/admin/paidplans'
 import { Route as AdminLinksRouteImport } from './routes/admin/links'
 import { Route as AdminFreeplansRouteImport } from './routes/admin/freeplans'
+import { Route as ApiPublicEnsureAdminRouteImport } from './routes/api/public/ensure-admin'
 import { Route as ApiPublicPterodactylCreateUserRouteImport } from './routes/api/public/pterodactyl/create-user'
 import { Route as ApiPublicPterodactylCreateServerRouteImport } from './routes/api/public/pterodactyl/create-server'
 
@@ -120,6 +121,11 @@ const AdminFreeplansRoute = AdminFreeplansRouteImport.update({
   path: '/freeplans',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicEnsureAdminRoute = ApiPublicEnsureAdminRouteImport.update({
+  id: '/api/public/ensure-admin',
+  path: '/api/public/ensure-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPterodactylCreateUserRoute =
   ApiPublicPterodactylCreateUserRouteImport.update({
     id: '/api/public/pterodactyl/create-user',
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
   '/paid/': typeof PaidIndexRoute
+  '/api/public/ensure-admin': typeof ApiPublicEnsureAdminRoute
   '/api/public/pterodactyl/create-server': typeof ApiPublicPterodactylCreateServerRoute
   '/api/public/pterodactyl/create-user': typeof ApiPublicPterodactylCreateUserRoute
 }
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/free': typeof FreeIndexRoute
   '/paid': typeof PaidIndexRoute
+  '/api/public/ensure-admin': typeof ApiPublicEnsureAdminRoute
   '/api/public/pterodactyl/create-server': typeof ApiPublicPterodactylCreateServerRoute
   '/api/public/pterodactyl/create-user': typeof ApiPublicPterodactylCreateUserRoute
 }
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/free/': typeof FreeIndexRoute
   '/paid/': typeof PaidIndexRoute
+  '/api/public/ensure-admin': typeof ApiPublicEnsureAdminRoute
   '/api/public/pterodactyl/create-server': typeof ApiPublicPterodactylCreateServerRoute
   '/api/public/pterodactyl/create-user': typeof ApiPublicPterodactylCreateUserRoute
 }
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/free/'
     | '/paid/'
+    | '/api/public/ensure-admin'
     | '/api/public/pterodactyl/create-server'
     | '/api/public/pterodactyl/create-user'
   fileRoutesByTo: FileRoutesByTo
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/free'
     | '/paid'
+    | '/api/public/ensure-admin'
     | '/api/public/pterodactyl/create-server'
     | '/api/public/pterodactyl/create-user'
   id:
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/free/'
     | '/paid/'
+    | '/api/public/ensure-admin'
     | '/api/public/pterodactyl/create-server'
     | '/api/public/pterodactyl/create-user'
   fileRoutesById: FileRoutesById
@@ -270,6 +282,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PaidRoute: typeof PaidRouteWithChildren
   SignupRoute: typeof SignupRoute
+  ApiPublicEnsureAdminRoute: typeof ApiPublicEnsureAdminRoute
   ApiPublicPterodactylCreateServerRoute: typeof ApiPublicPterodactylCreateServerRoute
   ApiPublicPterodactylCreateUserRoute: typeof ApiPublicPterodactylCreateUserRoute
 }
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFreeplansRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/ensure-admin': {
+      id: '/api/public/ensure-admin'
+      path: '/api/public/ensure-admin'
+      fullPath: '/api/public/ensure-admin'
+      preLoaderRoute: typeof ApiPublicEnsureAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/pterodactyl/create-user': {
       id: '/api/public/pterodactyl/create-user'
       path: '/api/public/pterodactyl/create-user'
@@ -474,6 +494,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PaidRoute: PaidRouteWithChildren,
   SignupRoute: SignupRoute,
+  ApiPublicEnsureAdminRoute: ApiPublicEnsureAdminRoute,
   ApiPublicPterodactylCreateServerRoute: ApiPublicPterodactylCreateServerRoute,
   ApiPublicPterodactylCreateUserRoute: ApiPublicPterodactylCreateUserRoute,
 }
